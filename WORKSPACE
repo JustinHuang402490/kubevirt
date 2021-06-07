@@ -204,6 +204,13 @@ go_repository(
     importpath = "github.com/masterzen/winrm-cli",
 )
 
+# mxj map
+#go_repository(
+#    name = "com_github_clbanning_mxj",
+#    importpath = "https://github.com/clbanning/mxj",
+#    tag = "v2.3.2",
+#)
+
 # Winrmcp deps
 go_repository(
     name = "com_github_packer_community_winrmcp",

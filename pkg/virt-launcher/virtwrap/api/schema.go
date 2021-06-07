@@ -443,6 +443,7 @@ type HostDevice struct {
 	Mode      string           `xml:"mode,attr,omitempty"`
 	Model     string           `xml:"model,attr,omitempty"`
 	Address   *Address         `xml:"address,emitempty"`
+	RomFile   string           `xml:"rom,omitempty"`
 }
 
 type HostDeviceSource struct {
