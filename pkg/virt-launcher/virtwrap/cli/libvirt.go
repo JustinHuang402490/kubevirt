@@ -166,11 +166,21 @@ func (l *LibvirtConnection) LookupDomainByName(name string) (dom VirDomain, err 
 }
 
 func (l *LibvirtConnection) DomainDefineXML(xml string) (dom VirDomain, err error) {
+	log.Log.Info("\n---------LibvirtConnection.DomainDefineXML-----------")
+
+	fmt.Println("-----------Wanted domain Spec. in DomainDefineXML = ", xml)
+
 	if err = l.reconnectIfNecessary(); err != nil {
 		return
 	}
 
+	log.Log.Info("---------no err-----------")
 	dom, err = l.Connect.DomainDefineXML(xml)
+
+	fmt.Println("\ndom in libvirt.go:177 = ", dom)
+
+	domXML, err := dom.GetXMLDesc(0)
+	fmt.Println("\ndomXML in libvirt.go:180 = ", domXML)
 	l.checkConnectionLost(err)
 	return
 }

@@ -4,6 +4,8 @@
 package cli
 
 import (
+	"fmt"
+
 	gomock "github.com/golang/mock/gomock"
 	libvirt_go "libvirt.org/libvirt-go"
 
@@ -43,6 +45,7 @@ func (_mr *_MockConnectionRecorder) LookupDomainByName(arg0 interface{}) *gomock
 }
 
 func (_m *MockConnection) DomainDefineXML(xml string) (VirDomain, error) {
+	fmt.Println("\t----------xml in MockConnection DomainDefineXML = \n", xml)
 	ret := _m.ctrl.Call(_m, "DomainDefineXML", xml)
 	ret0, _ := ret[0].(VirDomain)
 	ret1, _ := ret[1].(error)

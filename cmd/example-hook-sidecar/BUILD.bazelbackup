@@ -2,7 +2,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = ["device-bus-id.go"],
+    srcs = ["smbios.go"],
     importpath = "kubevirt.io/kubevirt/cmd/example-hook-sidecar",
     visibility = ["//visibility:private"],
     deps = [
@@ -30,7 +30,7 @@ load(
 )
 
 container_image(
-    name = "mod-rom-sidecar",
+    name = "example-hook-sidecar-image",
     architecture = select({
         "@io_bazel_rules_go//go/platform:linux_ppc64le": "ppc64le",
         "//conditions:default": "amd64",
