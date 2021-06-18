@@ -1648,13 +1648,14 @@ func (l *LibvirtDomainManager) ListAllDomains() ([]*api.Domain, error) {
 }
 
 func (l *LibvirtDomainManager) setDomainSpecWithHooks(vmi *v1.VirtualMachineInstance, origSpec *api.DomainSpec) (cli.VirDomain, error) {
+	logger := log.Log.Object(vmi)
 
 	spec := origSpec.DeepCopy()
+	logger.Infof("spec from origSpec= %v", spec)
 	hooksManager := hooks.GetManager()
 
 	domainSpec, err := hooksManager.OnDefineDomain(spec, vmi)
-	logger := log.Log.Object(vmi)
-	logger.Infof("Wanted domain Spec. = %s", domainSpec)
+	logger.Infof("Wanted domain Spec. = %v", domainSpec)
 
 	if err != nil {
 		return nil, err

@@ -161,15 +161,20 @@ func onDefineDomain(vmiJSON []byte, domainXML []byte) ([]byte, error) {
 			//fmt.Println("composeDeviceBusId = ", composeDeviceBusId)
 			if strings.Contains(strAddress, deviceBusId) {
 				fmt.Println("\t\tDevice bus id = ", deviceBusId)
-				romFile := "/usr/share/NVIDIA_GTX1080Ti.dump"
-				fmt.Println("\t\tRom file location = ", romFile)
+				romFileLocation := "/usr/share/NVIDIA_GTX1080Ti.dump"
+				fmt.Println("\t\tRom file location = ", romFileLocation)
 
 				fmt.Println("\t\tindex = ", index)
 				indexRecord = index
-				//domainSpec.Devices.HostDevices[index]. = append(domainSpec.Devices.HostDevices, romFile)
-				domainSpec.Devices.HostDevices[index].RomFile = romFile
 
-				//domainSpec.Devices.HostDevices[index].Type = "changedPCI"
+				romFile := domainSchema.RomFile{}
+				fmt.Println("\t\t---------1---------")
+				romFile.File = romFileLocation
+				fmt.Println("\t\t---------2---------")
+				//domainSpec.Devices.HostDevices[index] = append(domainSpec.Devices.HostDevices[index], romFile)
+				domainSpec.Devices.HostDevices[index].RomFile = romFile
+				//domainSpec.Devices.HostDevices[index].RomFile.File = romFileLocation
+				fmt.Println("\t\tAdd romFileLocation successfully")
 			} else {
 				fmt.Println("\t\tstrAddress = ", strAddress)
 			}
@@ -183,7 +188,7 @@ func onDefineDomain(vmiJSON []byte, domainXML []byte) ([]byte, error) {
 
 	//newDomainXML, err := m.Xml()
 
-	fmt.Println("domainSpec.Devices.HostDevices[indexRecord].RomFile = ", domainSpec.Devices.HostDevices[indexRecord].RomFile)
+	fmt.Println("domainSpec.Devices.HostDevices[indexRecord].RomFile.File = ", domainSpec.Devices.HostDevices[indexRecord].RomFile.File)
 	newDomainXML, err := xml.Marshal(domainSpec)
 	if err != nil {
 		log.Log.Reason(err).Errorf("Failed to marshal updated domain spec: %+v", domainSpec)

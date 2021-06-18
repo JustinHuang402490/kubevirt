@@ -443,11 +443,15 @@ type HostDevice struct {
 	Mode      string           `xml:"mode,attr,omitempty"`
 	Model     string           `xml:"model,attr,omitempty"`
 	Address   *Address         `xml:"address,emitempty"`
-	RomFile   string           `xml:"rom,omitempty"`
+	RomFile   RomFile          `xml:"rom,omitempty"`
 }
 
 type HostDeviceSource struct {
 	Address *Address `xml:"address,omitempty"`
+}
+
+type RomFile struct {
+	File string `xml:"file,attr"`
 }
 
 // END HostDevice -----------------------------
