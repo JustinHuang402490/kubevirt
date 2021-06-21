@@ -1263,17 +1263,13 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulat
 				return nil, err
 			}
 			logger.Info("Domain defined.")
-			logger.Info("------------------1--------------------")
 		} else {
 			logger.Reason(err).Error("Getting the domain failed.")
 			return nil, err
 		}
 	}
-	logger.Info("------------------2--------------------")
 	defer dom.Free()
-	logger.Info("------------------3--------------------")
 	domState, _, err := dom.GetState()
-	logger.Info("------------------4--------------------")
 	if err != nil {
 		logger.Reason(err).Error("Getting the domain state failed.")
 		return nil, err
@@ -1315,8 +1311,6 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulat
 	}
 
 	xmlstr, err := dom.GetXMLDesc(0)
-	//logger.Info("\n-----------------xmlstr---------------------")
-	//logger.Infof("xmlstr = %v", xmlstr)
 
 	if err != nil {
 		return nil, err
@@ -1324,8 +1318,6 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulat
 
 	var newSpec api.DomainSpec
 	err = xml.Unmarshal([]byte(xmlstr), &newSpec)
-	//logger.Info("\n-----------------newSpec---------------------")
-	//logger.Infof("newSpec = %v", newSpec)
 
 	if err != nil {
 		logger.Reason(err).Error("Parsing domain XML failed.")
@@ -1648,14 +1640,9 @@ func (l *LibvirtDomainManager) ListAllDomains() ([]*api.Domain, error) {
 }
 
 func (l *LibvirtDomainManager) setDomainSpecWithHooks(vmi *v1.VirtualMachineInstance, origSpec *api.DomainSpec) (cli.VirDomain, error) {
-	logger := log.Log.Object(vmi)
-
 	spec := origSpec.DeepCopy()
-	logger.Infof("spec from origSpec= %v", spec)
 	hooksManager := hooks.GetManager()
-
 	domainSpec, err := hooksManager.OnDefineDomain(spec, vmi)
-	logger.Infof("Wanted domain Spec. = %v", domainSpec)
 
 	if err != nil {
 		return nil, err

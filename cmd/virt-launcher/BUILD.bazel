@@ -55,6 +55,13 @@ container_image(
     files = ["//:get-version"],
 )
 
+filegroup(
+    name = "rom_files_group",
+    srcs = [
+        "rom-files",
+    ],
+)
+
 container_image(
     name = "virt-launcher-image",
     architecture = select({
@@ -65,6 +72,7 @@ container_image(
     directory = "/usr/bin",
     entrypoint = ["/usr/bin/virt-launcher"],
     files = [
+        ":rom_files_group",
         ":virt-launcher",
         "//cmd/container-disk-v2alpha:container-disk",
     ],

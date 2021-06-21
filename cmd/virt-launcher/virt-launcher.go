@@ -210,11 +210,9 @@ func waitForDomainUUID(timeout time.Duration, events chan watch.Event, stop chan
 		if e.Object != nil && e.Type == watch.Added {
 			domain := e.Object.(*api.Domain)
 			log.Log.Infof("Detected domain with UUID %s", domain.Spec.UUID)
-			fmt.Println("\ndomain in watch.Added = ", domain)
 			return domain
 		} else if e.Type == watch.Modified {
 			domain, ok := e.Object.(*api.Domain)
-			fmt.Println("\ndomain in watch.Modified = ", domain)
 			if ok && domain.ObjectMeta.DeletionTimestamp != nil {
 				return nil
 			}

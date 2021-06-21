@@ -1,0 +1,58 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  creationTimestamp: 2018-07-04T15:03:08Z
+  generation: 1
+  labels:
+    kubevirt.io/os: win10
+    special: key
+  name: vm-win10
+spec:
+  running: true
+  template:
+    metadata:
+      annotations:
+        # Request the hook sidecar
+        hooks.kubevirt.io/hookSidecars: '[{"args": ["--version", "v1alpha2"], "image": "justinhuang402490/example-hook-sidecar:dev-kubevirt-v10"}]'
+        custom.kubevirt.io/domain.devices.hostdevices.source.address: "0x01 0x00 0x0"
+        custom.kubevirt.io/gpuRomFile: "NVIDIA_GTX1080Ti.dump"
+        # Overwrite base board manufacturer name
+        #smbios.vm.kubevirt.io/baseBoardManufacturer: "Radical !!!"
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: pvc-win10vm
+        special: key
+    spec:
+      domain:
+        features:
+          hyperv:
+            vendorid:
+              enabled: true
+              vendorid: 10de:1b06
+          kvm:
+            hidden: true
+        cpu:
+          cores: 2
+        devices:
+          blockMultiQueue: true
+          gpus:
+          - deviceName: nvidia.com/GP102_GeForce_GTX_1080_Ti
+            name: gpu-test
+          disks:
+          - disk:
+              bus: sata
+            name: disk0
+            cache: none
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 4096M
+      volumes:
+      - name: disk0
+        persistentVolumeClaim:
+          claimName: pvc-win10vm

@@ -28,12 +28,8 @@ import (
 	"os"
 	"strings"
 
-	//"strings"
-
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
-
-	//"github.com/clbanning/mxj/v2"
 
 	vmSchema "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/log"
@@ -47,6 +43,7 @@ import (
 const (
 	baseBoardManufacturerAnnotation = "smbios.vm.kubevirt.io/baseBoardManufacturer"
 	deviceBusIdAnnotation           = "custom.kubevirt.io/domain.devices.hostdevices.source.address"
+	gpuRomFileAnnotation            = "custom.kubevirt.io/gpuRomFile"
 	onDefineDomainLoggingMessage    = "Hook's OnDefineDomain callback method has been called"
 )
 
@@ -118,7 +115,6 @@ func onDefineDomain(vmiJSON []byte, domainXML []byte) ([]byte, error) {
 		return domainXML, nil
 	}
 
-	//domainSpecMap, err := mxj.NewMapXml(domainSchema.DomainSpec{})
 	domainSpec := domainSchema.DomainSpec{}
 	err = xml.Unmarshal(domainXML, &domainSpec)
 	if err != nil {
@@ -126,20 +122,9 @@ func onDefineDomain(vmiJSON []byte, domainXML []byte) ([]byte, error) {
 		panic(err)
 	}
 
-	////domainSpec.OS.SMBios = &domainSchema.SMBios{Mode: "sysinfo"}
-
-	/*if domainSpec.SysInfo == nil {
-		domainSpec.SysInfo = &domainSchema.SysInfo{}
-	}*/
-	////domainSpec.SysInfo.Type = "smbios"
 	indexRecord := 0
 	if deviceBusId, found := annotations[deviceBusIdAnnotation]; found {
 		fmt.Println("\ndeviceBusId = ", deviceBusId)
-		//runes := []rune(deviceBusId)
-
-		/*for i, value := range runes {
-			fmt.Println("index = ", i, ", value = ", string(value))
-		}*/
 
 		devices := domainSpec.Devices
 		hostDevices := devices.HostDevices
@@ -154,39 +139,27 @@ func onDefineDomain(vmiJSON []byte, domainXML []byte) ([]byte, error) {
 			strAddress := fmt.Sprintf("%s", address)
 			//}
 
-			//composeDeviceBusId := (
-			//    ("0x"+ string(runes[0:1])) +
-			//    ("0x"+ string(runes[3:4])) +
-			//    ("0x"+ string(runes[6])))
-			//fmt.Println("composeDeviceBusId = ", composeDeviceBusId)
 			if strings.Contains(strAddress, deviceBusId) {
 				fmt.Println("\t\tDevice bus id = ", deviceBusId)
-				romFileLocation := "/usr/share/NVIDIA_GTX1080Ti.dump"
-				fmt.Println("\t\tRom file location = ", romFileLocation)
+				if romFile, found := annotations[gpuRomFileAnnotation]; found {
+					romFileLocation := "/usr/bin/rom-files/" + romFile
+					fmt.Println("\t\tRom file location = ", romFileLocation)
 
-				fmt.Println("\t\tindex = ", index)
-				indexRecord = index
+					//fmt.Println("\t\tindex = ", index)
+					indexRecord = index
 
-				romFile := domainSchema.RomFile{}
-				fmt.Println("\t\t---------1---------")
-				romFile.File = romFileLocation
-				fmt.Println("\t\t---------2---------")
-				//domainSpec.Devices.HostDevices[index] = append(domainSpec.Devices.HostDevices[index], romFile)
-				domainSpec.Devices.HostDevices[index].RomFile = romFile
-				//domainSpec.Devices.HostDevices[index].RomFile.File = romFileLocation
-				fmt.Println("\t\tAdd romFileLocation successfully")
+					romFile := domainSchema.RomFile{}
+					romFile.File = romFileLocation
+					domainSpec.Devices.HostDevices[index].RomFile = romFile
+					fmt.Println("\t\tAdd rom file location successfully")
+				} else {
+					fmt.Println("\t\tPlease check the rom file name in the annotation field: ", romFile)
+				}
 			} else {
 				fmt.Println("\t\tstrAddress = ", strAddress)
 			}
 		}
-		//if domainSpec.Devices.HostDevices
-		//domainSpec.SysInfo.BaseBoard = append(domainSpec.SysInfo.BaseBoard, domainSchema.Entry{
-		//	Name:  "manufacturer",
-		//	Value: baseBoardManufacturer,
-		//})
 	}
-
-	//newDomainXML, err := m.Xml()
 
 	fmt.Println("domainSpec.Devices.HostDevices[indexRecord].RomFile.File = ", domainSpec.Devices.HostDevices[indexRecord].RomFile.File)
 	newDomainXML, err := xml.Marshal(domainSpec)
@@ -199,21 +172,6 @@ func onDefineDomain(vmiJSON []byte, domainXML []byte) ([]byte, error) {
 
 	return newDomainXML, nil
 }
-
-/*func ensureFinalPathExists(path string, m mxj.Map) ([]byte, error) {
-	pathSplitted := strings.Split(path, ".")
-	var vp = pathSplitted[0]
-	for _, p := range pathSplitted[1:] {
-		if !m.Exists(vp) {
-			err := m.SetValueForPath(map[string]interface{}{}, vp)
-			if err != nil {
-				return nil, err
-			}
-		}
-		vp = vp + "." + p
-	}
-	return nil, nil
-}*/
 
 func main() {
 	log.InitializeLogging("device-bus-id-hook-sidecar")
