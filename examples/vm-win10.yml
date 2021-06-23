@@ -37,12 +37,16 @@ spec:
           blockMultiQueue: true
           gpus:
           - deviceName: nvidia.com/GP102_GeForce_GTX_1080_Ti
-            name: gpu-test
+            name: gpu-1080Ti
           disks:
           - disk:
               bus: sata
             name: disk0
             cache: none
+          interfaces:
+          - bridge: {}
+            model: e1000
+            name: default
         firmware:
           bootloader:
             efi:
@@ -52,6 +56,9 @@ spec:
         resources:
           requests:
             memory: 4096M
+      networks:
+      - name: default
+        pod: {}
       volumes:
       - name: disk0
         persistentVolumeClaim:
